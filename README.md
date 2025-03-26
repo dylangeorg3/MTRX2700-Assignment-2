@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="images/banner.png" alt="MTRX2700 Assignment 2 Banner" width="100%"/>
+  <img src="images/backdrop.png" alt="MTRX2700 Assignment 2 Banner" width="100%"/>
 </p>
 
 # MTRX2700-Assignment-2 🤖
