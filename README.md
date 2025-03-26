@@ -1,6 +1,6 @@
 # MTRX2700-Assignment-2 🤖
 
-## Group X - NAME **
+## Group Number - NAME **
 
 ### **Authors ✍️:**  
 - **NAME**: SID  
