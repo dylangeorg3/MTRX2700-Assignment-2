@@ -70,9 +70,6 @@ Note that the repository is not publically available, for reasons pertaining to 
 <details>
 <summary><strong>Exercise 1 - Digital I/O 💡</strong></summary>
 
-<details>
-<summary><strong>Task 1A</strong></summary>
-
 #### **Description**
 Insert description
 
@@ -81,53 +78,6 @@ Insert how to use
 
 ### **Testing**
 Insert how module was tested
-
-
-
-
-
-</details>
-
-<details>
-<summary><strong>Task 1B</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
-
-<details>
-<summary><strong>Task 1C</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-</details>
-
-<details>
-<summary><strong>Task 1D</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
 
 </details>
 
@@ -136,9 +86,6 @@ Insert how module was tested
 <details>
 <summary><strong>Exercise 2 - Serial Interface 📡</strong></summary>
 
-<details>
-<summary><strong>Task 2A</strong></summary>
-
 #### **Description**
 Insert description
 
@@ -147,49 +94,6 @@ Insert how to use
 
 ### **Testing**
 Insert how module was tested
-</details>
-
-<details>
-<summary><strong>Task 2B</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
-
-<details>
-<summary><strong>Task 2C</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
-
-<details>
-<summary><strong>Task 2D</strong></summary>
-
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
 
 </details>
 
@@ -198,9 +102,6 @@ Insert how module was tested
 <details>
 <summary><strong>Exercise 3 - Timer Interface ⏳</strong></summary>
 
-<details>
-<summary><strong>Task 3A</strong></summary>
-
 #### **Description**
 Insert description
 
@@ -209,46 +110,6 @@ Insert how to use
 
 ### **Testing**
 Insert how module was tested
-
-</details>
-
-<details>
-<summary><strong>Task 3B</strong></summary>
-
-#### **Description**
-This task recieves an input string of characters from the PC serial communication terminal, which it will read character by character before storing it in memory on the microcontroller.
-
-#### **Usage**
-First open CuteCom (Mac) or PuTTY (Windows) and connect to the USB port you have connected to the microcontroller, as well as choosing the appropriate baud rate (115200 in this case). Then, debug `assembly.s` in the STM32CubeIDE and manually step through the code until line 39 is reached:
-```assembly
-	loop_forever:
-    	LDR R0, =USART1            @ Load base address of UART
-```
-You will then resume the code by pressing F8, and send the given string using the CuteCom serial communication terminal. Suspend the code. To check that the message has been recieved, enable Memory Browser, and paste in the address that is currently stored in `R6`. The resulting hex values stored at this address will be displayed, as well as the ASCII representation on the far right where your string should now be stored.
-The program has allocated for 62 bytes (or 62 ASCII characters) to be transmitted as seen in lines 13-17 of `assembly.s`. 
-```assembly
-	@ Allocate space for the incoming buffer
-	incoming_buffer: .byte 62
-	
-	@ Store the size of the buffer
-	incoming_counter: .byte 62
-```
-If you wish to transmit a longer message, you will need to increase the buffer and counter sizes accordingly.
-</details>
-
-<details>
-<summary><strong>Task 3C</strong></summary>
-  
-#### **Description**
-Insert description
-
-#### **Usage**
-Insert how to use
-
-### **Testing**
-Insert how module was tested
-
-</details>
 
 
 
