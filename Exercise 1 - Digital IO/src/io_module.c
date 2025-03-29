@@ -1,5 +1,3 @@
-// io_module.c
-
 #include "io_module.h"
 #include "stm32f303xc.h"
 
