@@ -1,72 +1,91 @@
 #include "io_module.h"
 #include "stm32f303xc.h"
 
-static void (*button_callback)(void) = 0;
-static uint8_t led_state = 0;
-static uint8_t led_update_allowed = 1;
 
-void io_init(void (*callback)(void)) {
-    button_callback = callback;
 
-    // Enable GPIO clocks
-    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOEEN;
 
-    // LED (PE8) as output
-    GPIOE->MODER &= ~(0x3 << (2 * 8));
-    GPIOE->MODER |=  (0x1 << (2 * 8));
 
-    // Button (PA0): input mode by default
 
-    // Enable SYSCFG
-    RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
-    // EXTI0 config
-    SYSCFG->EXTICR[0] &= ~SYSCFG_EXTICR1_EXTI0_Msk; // PA0
-    EXTI->RTSR |= EXTI_RTSR_TR0;
-    EXTI->IMR  |= EXTI_IMR_MR0;
+// Store a pointer to the function that is called when a button is pressed
+// Set a default value of NULL so that it won't be called until the
+// Function pointer is defined
+void (*on_button_press)() = 0x00;
 
-    NVIC_SetPriority(EXTI0_IRQn, 1);
-    NVIC_EnableIRQ(EXTI0_IRQn);
+void EXTI0_IRQHandler(void)
+{
+	// Run the button press handler (make sure it is not null first !)
+	if (on_button_press != 0x00) {
+		on_button_press();
+	}
 
-    // Enable timer (e.g., TIM2)
-    RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
-    TIM2->PSC = 64000 - 1;   // Prescaler (assume 64 MHz / 64k = 1kHz)
-    TIM2->ARR = 200;         // 200ms period
-    TIM2->DIER |= TIM_DIER_UIE;
-    TIM2->CR1 |= TIM_CR1_CEN;
-
-    NVIC_EnableIRQ(TIM2_IRQn);
+	// Reset the interrupt (so it doesn't keep firing until the next trigger)
+	EXTI->PR |= EXTI_PR_PR0;
 }
 
-// LED access
-void io_set_led(uint8_t state) {
-    led_state = state;
+
+
+// Enable the clocks for desired peripherals (GPIOA, C and E)
+void enable_clocks() {
+	RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOCEN | RCC_AHBENR_GPIOEEN;
 }
 
-uint8_t io_get_led(void) {
-    return led_state;
+
+// Initialise the discovery board I/O (just outputs: inputs are selected by default)
+void initialise_board() {
+	// Get a pointer to the second half word of the MODER register (for outputs pe8-15)
+	uint16_t *led_output_registers = ((uint16_t *)&(GPIOE->MODER)) + 1;
+	*led_output_registers = 0x5555;
 }
 
-// Timer interrupt for rate-limiting LED update
-void TIM2_IRQHandler(void) {
-    TIM2->SR &= ~TIM_SR_UIF; // Clear update flag
 
-    if (led_update_allowed) {
-        if (led_state)
-            GPIOE->ODR |= (1 << 8);
-        else
-            GPIOE->ODR &= ~(1 << 8);
+void enable_interrupt() {
+	// Disable the interrupts while messing around with the settings
+	//  Otherwise can lead to strange behaviour
+	__disable_irq();
 
-        led_update_allowed = 0;
-    }
+	// Enable the system configuration controller (SYSCFG in RCC)
+	RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
 
-    led_update_allowed = 1;
+	// External Interrupts details on large manual page 294)
+	// PA0 is on interrupt EXTI0 large manual - page 250
+	// EXTI0 in  SYSCFG_EXTICR1 needs to be 0x00 (SYSCFG_EXTICR1_EXTI0_PA)
+	SYSCFG->EXTICR[0] = SYSCFG_EXTICR1_EXTI0_PA;
+
+	//  Select EXTI0 interrupt on rising edge
+	EXTI->RTSR |= EXTI_RTSR_TR0; // rising edge of EXTI line 0 (includes PA0)
+
+	// Set the interrupt from EXTI line 0 as 'not masked' - as in, enable it.
+	EXTI->IMR |= EXTI_IMR_MR0;
+
+	// Tell the NVIC module that EXTI0 interrupts should be handled
+	NVIC_SetPriority(EXTI0_IRQn, 1);  // Set Priority
+	NVIC_EnableIRQ(EXTI0_IRQn);
+
+	// Re-enable all interrupts (now that we are finished)
+	__enable_irq();
 }
 
-// Button ISR
-void EXTI0_IRQHandler(void) {
-    if (button_callback != 0)
-        button_callback();
 
-    EXTI->PR |= EXTI_PR_PR0;
+void chase_led(){
+	uint8_t *led_register = ((uint8_t*)&(GPIOE->ODR)) + 1;
+
+	*led_register <<= 1;
+	if (*led_register == 0) {
+		*led_register = 1;
+	}
 }
+
+
+
+void io_init(void) {
+	enable_clocks();
+	initialise_board();
+
+	// Set the interrupt handling function
+	on_button_press = &chase_led;
+
+	// Enable the interrupt for the button
+	enable_interrupt();
+}
+
