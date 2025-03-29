@@ -20,8 +20,8 @@ void toggle_led() {
 int main(void) {
     io_init(toggle_led);
 
-    while (1) {
-        // main loop can do other stuff
+    // Infinite loop
+    for(;;) {
     }
 }
 
