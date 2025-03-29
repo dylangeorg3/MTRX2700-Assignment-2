@@ -12,17 +12,13 @@
 
 #include "io_module.h"
 
-void toggle_led() {
-    uint8_t current = io_get_led();
-    io_set_led(!current);
-}
 
-int main(void) {
-    io_init(toggle_led);
+int main(void)
+{
+	io_init();
 
-    // Infinite loop
-    for(;;) {
-    }
+    // Loop forever
+	for(;;) {}
 }
 
 
